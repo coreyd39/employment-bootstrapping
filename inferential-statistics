@@ -1,0 +1,60 @@
+# VA Bootstrap simulation
+
+library(readxl)
+library(ggplot2)
+library(dplyr)
+library(mosaic)
+
+# Imports Data
+national_view = read_excel("~/R/Data/Raw US Employment Data (1).xlsx", sheet= 2)
+
+state_view = read_excel("~/R/Data/Raw US Employment Data (1).xlsx", sheet= 3)
+
+# Filters data to only consider most recent data points from each state (first 51 entries)
+states_today = state_view[1:51, ]
+
+# Filters to only consider VA data
+va_data = state_view %>%
+  filter(State %in% c("Virginia"))
+
+# Histogram of unemployment rate
+hist(states_today$`Unemployment Rate (%)`,breaks=51)
+
+# Histogram of quit rate
+hist(states_today$'Quit Rate (%)', breaks=51)
+
+# Histogram of hire rate
+hist(states_today$'Hire Rate (%)', breaks=51)
+
+# Even when experimenting various break counters, 
+# none of the data appears to be approximately normal
+# So, bootstrapping would be helpful
+
+# Bootstrap simulation for national Unemployment, quit, and hire rates using 
+# The most recent state sample data as the 'original' sample that gets resampled
+u_rate_bootstrap=do(10000)*mean(resample(states_today$"Unemployment Rate (%)"))
+
+q_rate_bootstrap=do(10000)*mean(resample(states_today$"Quit Rate (%)"))
+
+h_rate_bootstrap=do(10000)*mean(resample(states_today$"Hire Rate (%)"))
+
+# Unemployment Bootstrap histogram
+# Note that VA unemployment is 2.5%, so the difference in VA unemployment rate is statistically significant (hype)
+plot1=hist(u_rate_bootstrap$mean, xlab='Unemployment Rate Mean', main='Bootstrapped National Unemployment Rate',col='#9CCC65')
+u_limits=quantile(u_rate_bootstrap$mean, probs=c(0.025,0.975))
+abline(v=u_limits[2], col=2, lty=2)
+abline(v=u_limits[1], col=2, lty=2)
+
+# Quit Bootstrap histogram 
+# Note that VA quit rate is 2.7%, so the difference in VA quit rate is not statistically significant
+plot2=hist(q_rate_bootstrap$mean, xlab='Quit Rate Mean', main='Bootstrapped National Quit Rate',col='#7CB342')
+u_limits=quantile(q_rate_bootstrap$mean, probs=c(0.025,0.975))
+abline(v=u_limits[2], col=2, lty=2)
+abline(v=u_limits[1], col=2, lty=2)
+
+# Hire Bootstrap Histogram
+# Note that VA rate is 3.9%, so the difference in VA rate is not statistically significant 
+plot3=hist(h_rate_bootstrap$mean, xlab='Hire Rate Mean', main='Bootstrapped National Hire Rate',col='#558B2F')
+u_limits=quantile(h_rate_bootstrap$mean, probs=c(0.025,0.975))
+abline(v=u_limits[2], col=2, lty=2)
+abline(v=u_limits[1], col=2, lty=2)
