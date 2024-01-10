@@ -6,9 +6,9 @@ library(dplyr)
 library(mosaic)
 
 # Imports Data
-national_view = read_excel("~/R/Data/Raw US Employment Data (1).xlsx", sheet= 2)
+national_view = read_excel("~/R/Data/Raw US Employment Data .xlsx", sheet= 2)
 
-state_view = read_excel("~/R/Data/Raw US Employment Data (1).xlsx", sheet= 3)
+state_view = read_excel("~/R/Data/Raw US Employment Data .xlsx", sheet= 3)
 
 # Filters data to only consider most recent data points from each state (first 51 entries)
 states_today = state_view[1:51, ]
